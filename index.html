@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rifa en Tiempo Real - rifas.nexusaipro.pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f9; margin: 0; padding: 20px; }
+        h1 { color: #333; }
+        .grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 10px; max-width: 500px; margin: 20px auto; }
+        .cell { padding: 15px 0; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .libre { background-color: #2ecc71; color: white; }
+        .libre:hover { background-color: #27ae60; }
+        .ocupado { background-color: #e74c3c; color: white; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <h1>Gran Rifa Online</h1>
+    <p>Selecciona tu número disponible. Se actualizará en tiempo real.</p>
+    <div id="rifa-grid" class="grid"></div>
+    <script>
+        const SUPABASE_URL = 'https://egzyiruqivlvqjfhgrba.supabase.co';
+        const SUPABASE_ANON_KEY = 'Sb_publishable_t34FtTx_shKUXA_vAIPV8w_L5FLhw9V';
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const gridContainer = document.getElementById('rifa-grid');
+        async function cargarNumeros() {
+            const { data, error } = await _supabase.from('numeros_rifa').select('*').order('numero', { ascending: true });
+            if (error) { console.error('Error al cargar números:', error); return; }
+            renderizarGrid(data);
+        }
+        function renderizarGrid(numeros) {
+            gridContainer.innerHTML = '';
+            numeros.forEach(item => {
+                const btn = document.createElement('button');
+                btn.textContent = item.numero;
+                btn.className = `cell ${item.estado}`;
+                if (item.estado === 'libre') {
+                    btn.onclick = () => seleccionarNumero(item.numero);
+                } else {
+                    btn.disabled = true;
+                }
+                gridContainer.appendChild(btn);
+            });
+        }
+        async function seleccionarNumero(numero) {
+            const nombre = prompt(`Vas a apartar el número ${numero}. Ingresa tu nombre:`);
+            if (!nombre) return;
+            const { error } = await _supabase.from('numeros_rifa').update({ estado: 'ocupado', comprador: nombre }).eq('numero', numero).eq('estado', 'libre');
+            if (error) { alert('No se pudo apartar el número. Es posible que alguien más lo haya elegido.'); cargarNumeros(); }
+        }
+        _supabase.channel('public:numeros_rifa').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'numeros_rifa' }, payload => { cargarNumeros(); }).subscribe();
+        cargarNumeros();
+    </script>
+</body>
+</html>
+
