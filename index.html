@@ -166,7 +166,7 @@
     <div class="leyenda">
       <span><i class="dot libre"></i> Libre</span>
       <span><i class="dot ocupado"></i> Ocupado</span>
-      <span><i class="dot seleccion"></i> Tu selección</span>
+      <span><i class="dot seleccion"></i> Apartado</span>
     </div>
     <div class="grid" id="grid"></div>
     <div class="resumen">
@@ -194,13 +194,11 @@
   const nombresDias = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
 
   function pintarLoteriaDelDia() {
-    const hoy = new Date().getDay();
-    const l = loterias[hoy];
-    document.getElementById("loteriaDia").textContent = nombresDias[hoy];
-    document.getElementById("loteriaNombre").textContent = l.nombre;
-    document.getElementById("loteriaHora").textContent = l.hora;
-  }
-  pintarLoteriaDelDia();
+  document.getElementById("loteriaDia").textContent = "MIÉRCOLES 12 DE AGOSTO DE 2026";
+  document.getElementById("loteriaNombre").textContent = "Lotería de Manizales";
+  document.getElementById("loteriaHora").textContent = "10:30 PM";
+}
+pintarLoteriaDelDia();
 
   // ---------- Grilla ----------
   const gridEl = document.getElementById("grid");
@@ -213,7 +211,7 @@
       const info = numerosData[n];
       const estado = info ? info.estado : "libre";
       const div = document.createElement("div");
-      div.className = "cell " + (estado === "ocupado" ? "ocupado" : "libre");
+      div.className = "cell " + (estado === "ocupado" ? "ocupado" : (estado === "apartado" ? "seleccionado" : "libre"));
       if (seleccionados.has(n)) div.classList.add("seleccionado");
       div.textContent = n.toString().padStart(2, "0");
       if (estado !== "ocupado") {
