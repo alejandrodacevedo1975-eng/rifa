@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel Administrador</title>
+
+<link rel="stylesheet" href="admin.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+<h1>🎛 Panel de Administración</h1>
+
+<div class="estadisticas">
+<div>🟢 Libres<br><span id="libres">0</span></div>
+<div>🟡 Apartados<br><span id="apartados">0</span></div>
+<div>🔴 Vendidos<br><span id="vendidos">0</span></div>
+</div>
+
+<div id="grid"></div>
+
+<div id="modal" style="display:none;">
+<div id="ventana">
+
+<h2 id="tituloNumero"></h2>
+
+<p id="nombreComprador"></p>
+
+<button id="btnLibre">🟢 Libre</button>
+
+<button id="btnApartado">🟡 Apartado</button>
+
+<button id="btnVendido">🔴 Vendido</button>
+
+<button id="btnCerrar">❌ Cerrar</button>
+
+</div>
+</div>
+
+<script src="admin.js"></script>
+
+</body>
+</html>

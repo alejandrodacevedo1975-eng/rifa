@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rif@ MILLONARIA</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0f172a;
+    color: #f1f5f9;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    padding-bottom: 110px;
+  }
+
+  .container { max-width: 480px; margin: 0 auto; padding: 20px 16px; }
+
+  header { text-align: center; margin-bottom: 20px; }
+  header .titulo {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    font-size: 28px; font-weight: bold; color: #ffffff;
+  }
+  header .slot { font-size: 34px; margin: 8px 0; }
+  header p { color: #94a3b8; font-size: 14px; margin-top: 6px; }
+
+  .banner-valor {
+    background: #10b981; color: #06281c; font-weight: bold;
+    text-align: center; padding: 14px; border-radius: 10px;
+    font-size: 16px; margin-bottom: 16px;
+  }
+
+  .aviso {
+    background: #1e293b; border-left: 4px solid #f59e0b; border-radius: 8px;
+    padding: 12px 14px; font-size: 14px; color: #cbd5e1; margin-bottom: 22px;
+  }
+
+  .seccion-titulo {
+    display: flex; align-items: center; gap: 8px; color: #f59e0b;
+    font-size: 18px; font-weight: bold; margin-bottom: 10px;
+    padding-bottom: 8px; border-bottom: 2px solid #f59e0b;
+  }
+
+  section { margin-bottom: 26px; }
+
+  .premio-item {
+    background: #1e293b; border-radius: 10px; padding: 12px 14px; margin-bottom: 10px;
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  }
+  .premio-item .info .titulo-premio { font-size: 15px; font-weight: bold; color: #f1f5f9; }
+  .premio-item .info .detalle-premio { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+  .premio-item .monto { color: #f59e0b; font-weight: bold; font-size: 17px; white-space: nowrap; }
+
+  .loteria-hoy {
+    background: #1e293b; border-left: 4px solid #f59e0b; border-radius: 10px;
+    padding: 14px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .loteria-hoy .dia { font-size: 12px; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.5px; }
+  .loteria-hoy .nombre { font-size: 16px; font-weight: bold; color: #f1f5f9; margin-top: 2px; }
+  .loteria-hoy .hora { font-size: 18px; font-weight: bold; color: #10b981; }
+
+  .pago-caja { background: #1e293b; border-radius: 10px; padding: 14px; }
+  .pago-caja p { font-size: 14px; margin-bottom: 8px; color: #f1f5f9; }
+  .pago-caja .nequi-linea { font-size: 17px; font-weight: bold; }
+  .pago-caja .nequi-linea .numero { color: #10b981; }
+  .pago-caja .titular { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+
+  .leyenda { display: flex; justify-content: center; gap: 18px; margin-bottom: 12px; font-size: 12px; color: #cbd5e1; }
+  .leyenda span { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .dot.libre { background: #10b981; }
+  .dot.ocupado { background: #ef4444; }
+  .dot.seleccion { background: #f59e0b; }
+
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  @media (min-width: 380px) { .grid { grid-template-columns: repeat(6, 1fr); } }
+  @media (min-width: 460px) { .grid { grid-template-columns: repeat(8, 1fr); } }
+
+  .cell {
+    aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center;
+    border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer;
+    user-select: none; color: #fff; transition: transform 0.1s ease;
+  }
+  .cell:active { transform: scale(0.92); }
+  .cell.libre { background: #10b981; }
+  .cell.ocupado { background: #ef4444; cursor: not-allowed; opacity: 0.85; }
+  .cell.seleccionado { background: #f59e0b; color: #0f172a; }
+
+  .resumen { margin-top: 14px; font-size: 13px; color: #94a3b8; text-align: center; }
+  .resumen strong { color: #f1f5f9; }
+
+  .whatsapp-fixed {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 999;
+    background: #10b981; color: #06281c; border: none; padding: 16px;
+    font-size: 15px; font-weight: bold; text-align: center; display: block;
+    width: 100%; text-decoration: none; box-shadow: 0 -4px 12px rgba(0,0,0,0.35);
+  }
+  .whatsapp-fixed:active { background: #0ea371; }
+  .whatsapp-fixed:disabled, .whatsapp-fixed.deshabilitado {
+    background: #475569; color: #94a3b8; cursor: not-allowed;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <div class="titulo">🎰 Rif@ MILLONARIA</div>
+    <div class="slot">🎰</div>
+    <p>¡Participa, aparta tu número y gana grandes premios!</p>
+  </header>
+
+  <div class="banner-valor">💵 Valor del Puesto: $3.000</div>
+
+  <div class="aviso">📊 La rifa se juega al completar mínimo el 80% de los números vendidos.</div>
+
+  <section>
+    <div class="seccion-titulo">🏆 Premios en Juego</div>
+    <div class="premio-item">
+      <div class="info">
+        <div class="titulo-premio">🥇 1er Premio</div>
+        <div class="detalle-premio">Con los 2 últimos números</div>
+      </div>
+      <div class="monto">$130.000</div>
+    </div>
+    <div class="premio-item">
+      <div class="info">
+        <div class="titulo-premio">🥈 2do Premio</div>
+        <div class="detalle-premio">Con los 2 primeros números</div>
+      </div>
+      <div class="monto">$35.000</div>
+    </div>
+    <div class="premio-item">
+      <div class="info">
+        <div class="titulo-premio">🥉 3er Premio</div>
+        <div class="detalle-premio">Con los 2 números del medio</div>
+      </div>
+      <div class="monto">$25.000</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="seccion-titulo">🎲 Lotería de Hoy</div>
+    <div class="loteria-hoy" id="loteriaHoy">
+      <div>
+        <div class="dia" id="loteriaDia">-</div>
+        <div class="nombre" id="loteriaNombre">-</div>
+      </div>
+      <div class="hora" id="loteriaHora">-</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="seccion-titulo">💳 Forma de Pago</div>
+    <div class="pago-caja">
+      <p>1. Transfiere al Nequi:</p>
+      <div class="nequi-linea">💚 Nequi: <span class="numero">3214019528</span></div>
+      <div class="titular">Titular: Rif@s Duarte</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="seccion-titulo">🔢 Números Disponibles</div>
+    <div class="leyenda">
+      <span><i class="dot libre"></i> Libre</span>
+      <span><i class="dot ocupado"></i> Ocupado</span>
+      <span><i class="dot seleccion"></i> Tu selección</span>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="resumen">
+      Seleccionados: <strong id="resumenSeleccion">Ninguno</strong>
+    </div>
+  </section>
+
+</div>
+
+<a href="#" class="whatsapp-fixed" id="btnWhatsapp">Enviar Comprobante por WhatsApp</a>
+
+<script>
+  const WHATSAPP_NUMERO = "573214019528";
+
+  // ---------- Loteria del dia ----------
+  const loterias = [
+    { nombre: "Motilón Noche",           hora: "9:00 PM"  },
+    { nombre: "Lotería del Tolima",      hora: "10:30 PM" },
+    { nombre: "Lotería de la Cruz Roja", hora: "10:30 PM" },
+    { nombre: "Lotería de Manizales",    hora: "10:30 PM" },
+    { nombre: "Lotería de Bogotá",       hora: "11:10 PM" },
+    { nombre: "Lotería de Santander",    hora: "11:00 PM" },
+    { nombre: "Lotería de Boyacá",       hora: "10:40 PM" }
+  ];
+  const nombresDias = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+
+  function pintarLoteriaDelDia() {
+    const hoy = new Date().getDay();
+    const l = loterias[hoy];
+    document.getElementById("loteriaDia").textContent = nombresDias[hoy];
+    document.getElementById("loteriaNombre").textContent = l.nombre;
+    document.getElementById("loteriaHora").textContent = l.hora;
+  }
+  pintarLoteriaDelDia();
+
+  // ---------- Grilla ----------
+  const gridEl = document.getElementById("grid");
+  const seleccionados = new Set();
+  let numerosData = {};
+
+  function renderGrid() {
+    gridEl.innerHTML = "";

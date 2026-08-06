@@ -1,0 +1,155 @@
+    for (let n = 0; n <= 99; n++) {
+      const info = numerosData[n];
+      const estado = info ? info.estado : "libre";
+      const div = document.createElement("div");
+      div.className = "cell " + (estado === "ocupado" ? "ocupado" : "libre");
+      if (seleccionados.has(n)) div.classList.add("seleccionado");
+      div.textContent = n.toString().padStart(2, "0");
+      if (estado !== "ocupado") {
+        div.addEventListener("click", () => toggleSeleccion(n, div));
+      }
+      gridEl.appendChild(div);
+    }
+  }
+
+  function toggleSeleccion(n, el) {
+    if (seleccionados.has(n)) {
+      seleccionados.delete(n);
+      el.classList.remove("seleccionado");
+    } else {
+      seleccionados.add(n);
+      el.classList.add("seleccionado");
+    }
+    actualizarResumen();
+  }
+
+  function actualizarResumen() {
+    const texto = seleccionados.size === 0
+      ? "Ninguno"
+      : Array.from(seleccionados).sort((a,b)=>a-b).map(n => n.toString().padStart(2,"0")).join(", ");
+    document.getElementById("resumenSeleccion").textContent = texto;
+  }
+
+  renderGrid();
+
+  // ---------- Supabase ----------
+  const SUPABASE_URL = "https://egzyiruqivlvqjfhgrba.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_t34FtTx_shKUXA_vAIPV8w_L5FLhw9V";
+  let sb = null;
+
+  try {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function cargarNumeros() {
+      try {
+        const { data, error } = await sb
+          .from("numeros_rifa")
+          .select("id, numero, estado, comprador");
+        if (error) { console.error("Error cargando numeros_rifa:", error); return; }
+        numerosData = {};
+        data.forEach(row => { numerosData[row.numero] = row; });
+        renderGrid();
+      } catch (e) {
+        console.error("Fallo cargarNumeros:", e);
+      }
+    }
+    cargarNumeros();
+
+    sb
+      .channel("numeros_rifa_cambios")
+      .on("postgres_changes", { event: "*", schema: "public", table: "numeros_rifa" }, (payload) => {
+        const row = payload.new;
+        if (row && row.numero !== undefined) {
+          numerosData[row.numero] = row;
+          if (row.estado === "ocupado") seleccionados.delete(row.numero);
+          renderGrid();
+          actualizarResumen();
+        }
+      })
+      .subscribe();
+  } catch (e) {
+    console.error("No se pudo inicializar Supabase:", e);
+  }
+
+  // ---------- Boton whatsapp: marca automaticamente como ocupado ----------
+  const btnWhatsapp = document.getElementById("btnWhatsapp");
+
+  btnWhatsapp.addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    if (seleccionados.size === 0) {
+      alert("Selecciona al menos un número antes de enviar el comprobante.");
+      return;
+    }
+
+    if (!sb) {
+      alert("No se pudo conectar con la base de datos. Intenta de nuevo en unos segundos.");
+      return;
+    }
+
+    const nombreComprador = prompt("Escribe tu nombre completo para apartar el número:");
+    if (!nombreComprador || nombreComprador.trim() === "") {
+      alert("Debes escribir tu nombre para continuar.");
+      return;
+    }
+
+    const numerosSeleccionados = Array.from(seleccionados).sort((a,b)=>a-b);
+
+    btnWhatsapp.textContent = "Apartando número(s)...";
+    btnWhatsapp.classList.add("deshabilitado");
+
+    try {
+      // Solo marca los que SIGAN libres en este momento (evita choques si dos personas eligen a la vez)
+      const { data, error } = await sb
+        .from("numeros_rifa")
+        .update({ estado: "ocupado", comprador: nombreComprador.trim() })
+        .in("numero", numerosSeleccionados)
+        .eq("estado", "libre")
+        .select();
+
+      if (error) {
+        console.error("Error marcando numeros:", error);
+        alert("Hubo un error al apartar el número. Intenta de nuevo.");
+        btnWhatsapp.textContent = "Enviar Comprobante por WhatsApp";
+        btnWhatsapp.classList.remove("deshabilitado");
+        return;
+      }
+
+      const numerosMarcados = data.map(r => r.numero);
+      const numerosNoDisponibles = numerosSeleccionados.filter(n => !numerosMarcados.includes(n));
+
+      if (numerosNoDisponibles.length > 0) {
+        alert("Uno o más números que elegiste ya fueron tomados por otra persona: " +
+          numerosNoDisponibles.map(n => n.toString().padStart(2,"0")).join(", ") +
+          ". Por favor elige otro número.");
+      }
+
+      if (numerosMarcados.length === 0) {
+        btnWhatsapp.textContent = "Enviar Comprobante por WhatsApp";
+        btnWhatsapp.classList.remove("deshabilitado");
+        seleccionados.clear();
+        actualizarResumen();
+        return;
+      }
+
+      const textoNumeros = numerosMarcados.sort((a,b)=>a-b).map(n => n.toString().padStart(2,"0")).join(", ");
+      const mensaje = `Hola, soy ${nombreComprador.trim()}. Quiero enviar el comprobante de pago por el/los número(s) ${textoNumeros} de la Rif@ MILLONARIA.`;
+      const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensaje)}`;
+      window.location.href = url;
+
+      seleccionados.clear();
+      actualizarResumen();
+      btnWhatsapp.textContent = "Enviar Comprobante por WhatsApp";
+      btnWhatsapp.classList.remove("deshabilitado");
+    } catch (e) {
+      console.error("Fallo al apartar numeros:", e);
+      alert("Hubo un error de conexión. Intenta de nuevo.");
+      btnWhatsapp.textContent = "Enviar Comprobante por WhatsApp";
+      btnWhatsapp.classList.remove("deshabilitado");
+    }
+  });
+</script>
+
+</body>
+</html>
+
