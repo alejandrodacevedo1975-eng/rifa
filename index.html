@@ -268,11 +268,8 @@ pintarLoteriaDelDia();
       .channel("numeros_rifa_cambios")
       .on("postgres_changes", { event: "*", schema: "public", table: "numeros_rifa" }, (payload) => {
         const row = payload.new;
-        if (row && row.numero !== undefined) {
-          numerosData[row.numero] = row;
-          if (row.estado === "ocupado") seleccionados.delete(row.numero);
-          renderGrid();
-          actualizarResumen();
+        if (row) {
+          cargarNumeros();
         }
       })
       .subscribe();
