@@ -157,3 +157,5 @@ cargar();
 
 cargar();
 
+
+setInterval(() => { try { cargar(); } catch(e) {} }, 5000);
