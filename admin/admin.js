@@ -1,161 +1,259 @@
-const SUPABASE_URL="https://egzyiruqivlvqjfhgrba.supabase.co";
-const SUPABASE_KEY="sb_publishable_t34FtTx_shKUXA_vAIPV8w_L5FLhw9V";
+const SUPABASE_URL = "https://egzyiruqivlvqjfhgrba.supabase.co";
+const SUPABASE_KEY = "sb_publishable_t34FtTx_shKUXA_vAIPV8w_L5FLhw9V";
 
-const sb=window.supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
+const sb = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
 );
 
-const grid=document.getElementById("grid");
-const modal=document.getElementById("modal");
+const grid = document.getElementById("grid");
+const modal = document.getElementById("modal");
 
-const tituloNumero=document.getElementById("tituloNumero");
-const nombreComprador=document.getElementById("nombreComprador");
+const tituloNumero = document.getElementById("tituloNumero");
+const estadoActual = document.getElementById("estadoActual");
+const nombreComprador = document.getElementById("nombreComprador");
 
-const btnLibre=document.getElementById("btnLibre");
-const btnApartado=document.getElementById("btnApartado");
-const btnVendido=document.getElementById("btnVendido");
-const btnCerrar=document.getElementById("btnCerrar");
+const btnLibre = document.getElementById("btnLibre");
+const btnApartado = document.getElementById("btnApartado");
+const btnPagado = document.getElementById("btnPagado");
+const btnCerrar = document.getElementById("btnCerrar");
+const btnCerrarX = document.getElementById("btnCerrarX");
+const btnNuevaDinamica = document.getElementById("btnNuevaDinamica");
 
-let numeroActual=null;
+let numeroActual = null;
+let datos = [];
 
-async function cargar(){
-
-const {data,error}=await sb
-.from("numeros_rifa")
-.select("*")
-.order("numero");
-
-if(error){
-console.error(error);
-return;
+function normalizarEstado(estado) {
+  if (estado === "ocupado" || estado === "pagado") return "pagado";
+  if (estado === "apartado") return "apartado";
+  return "libre";
 }
 
-grid.innerHTML="";
-
-let libres=0;
-let apartados=0;
-let vendidos=0;
-
-data.forEach(r=>{
-
-const d=document.createElement("div");
-
-d.className="numero";
-
-if(r.estado==="ocupado"){
-d.classList.add("vendido");
-vendidos++;
-}else if(r.estado==="apartado"){
-d.classList.add("apartado");
-apartados++;
-}else{
-d.classList.add("libre");
-libres++;
+function textoEstado(estado) {
+  if (estado === "pagado") return "PAGADO";
+  if (estado === "apartado") return "APARTADO";
+  return "LIBRE";
 }
 
-d.textContent=String(r.numero).padStart(2,"0");
+function pintar() {
 
-d.onclick=()=>{
+  grid.innerHTML = "";
 
-numeroActual=r.numero;
+  let libres = 0;
+  let apartados = 0;
+  let pagados = 0;
 
-tituloNumero.textContent="Número "+String(r.numero).padStart(2,"0");
-nombreComprador.textContent=r.comprador||"Sin comprador";
+  // Siempre exactamente 00 hasta 99
+  for (let numero = 0; numero <= 99; numero++) {
 
-modal.style.display="flex";
+    const fila = datos.find(r => Number(r.numero) === numero);
 
+    const estado = normalizarEstado(
+      fila ? fila.estado : "libre"
+    );
+
+    const div = document.createElement("div");
+
+    div.className = "numero " + estado;
+
+    div.textContent = String(numero).padStart(2, "0");
+
+    if (estado === "libre") libres++;
+    if (estado === "apartado") apartados++;
+    if (estado === "pagado") pagados++;
+
+    div.onclick = () => abrirNumero(numero, fila, estado);
+
+    grid.appendChild(div);
+  }
+
+  document.getElementById("libres").textContent = libres;
+  document.getElementById("apartados").textContent = apartados;
+  document.getElementById("pagados").textContent = pagados;
+
+  document.getElementById("contador").textContent =
+    pagados + " / 100";
+
+  const porcentaje = pagados;
+
+  document.getElementById("barraProgreso").style.width =
+    porcentaje + "%";
+
+  const mensaje = document.getElementById("mensajeProgreso");
+
+  if (pagados === 100) {
+    mensaje.textContent =
+      "🎉 CARTÓN COMPLETO. YA SE PUEDE REALIZAR LA DINÁMICA.";
+  } else {
+    mensaje.textContent =
+      "La dinámica se realizará únicamente cuando estén pagados los 100 números.";
+  }
+}
+
+function abrirNumero(numero, fila, estado) {
+
+  numeroActual = numero;
+
+  tituloNumero.textContent =
+    "Número " + String(numero).padStart(2, "0");
+
+  estadoActual.textContent =
+    textoEstado(estado);
+
+  nombreComprador.textContent =
+    fila && fila.comprador
+      ? fila.comprador
+      : "Sin registrar";
+
+  modal.style.display = "flex";
+}
+
+async function cargar() {
+
+  const { data, error } = await sb
+    .from("numeros_rifa")
+    .select("id, numero, estado, comprador")
+    .order("numero", { ascending: true });
+
+  if (error) {
+    console.error("Error Supabase:", error);
+    return;
+  }
+
+  datos = data || [];
+
+  pintar();
+}
+
+async function cambiarEstado(nuevoEstado) {
+
+  if (numeroActual === null) return;
+
+  let comprador = null;
+
+  if (nuevoEstado === "apartado" ||
+      nuevoEstado === "pagado") {
+
+    const actual = datos.find(
+      r => Number(r.numero) === numeroActual
+    );
+
+    comprador = actual && actual.comprador
+      ? actual.comprador
+      : prompt(
+          "Nombre del comprador para el número " +
+          String(numeroActual).padStart(2, "0") + ":"
+        );
+
+    if (!comprador || comprador.trim() === "") {
+      alert("Debes indicar el nombre del comprador.");
+      return;
+    }
+
+    comprador = comprador.trim();
+  }
+
+  const cambios = {
+    estado: nuevoEstado,
+    comprador: comprador
+  };
+
+  const { error } = await sb
+    .from("numeros_rifa")
+    .update(cambios)
+    .eq("numero", numeroActual);
+
+  if (error) {
+    alert("Error: " + error.message);
+    console.error(error);
+    return;
+  }
+
+  await cargar();
+
+  const fila = datos.find(
+    r => Number(r.numero) === numeroActual
+  );
+
+  abrirNumero(
+    numeroActual,
+    fila,
+    normalizarEstado(nuevoEstado)
+  );
+}
+
+btnLibre.onclick = () => cambiarEstado("libre");
+
+btnApartado.onclick = () => cambiarEstado("apartado");
+
+btnPagado.onclick = () => cambiarEstado("pagado");
+
+function cerrarModal() {
+  modal.style.display = "none";
+  numeroActual = null;
+}
+
+btnCerrar.onclick = cerrarModal;
+btnCerrarX.onclick = cerrarModal;
+
+window.onclick = (e) => {
+  if (e.target === modal) {
+    cerrarModal();
+  }
 };
 
-grid.appendChild(d);
+btnNuevaDinamica.onclick = async () => {
 
-});
+  const confirmar = confirm(
+    "⚠️ ATENCIÓN\n\n" +
+    "Esto pondrá TODOS los números 00–99 como LIBRES " +
+    "y eliminará los compradores registrados.\n\n" +
+    "¿Seguro que quieres iniciar una nueva dinámica?"
+  );
 
-document.getElementById("libres").textContent=libres;
-document.getElementById("apartados").textContent=apartados;
-document.getElementById("vendidos").textContent=vendidos;
+  if (!confirmar) return;
 
-}
+  btnNuevaDinamica.disabled = true;
 
-async function cambiarEstado(estado){
+  const { error } = await sb
+    .from("numeros_rifa")
+    .update({
+      estado: "libre",
+      comprador: null
+    })
+    .gte("numero", 0)
+    .lte("numero", 99);
 
-if(numeroActual===null)return;
+  btnNuevaDinamica.disabled = false;
 
-const {error}=await sb
-.from("numeros_rifa")
-.update({estado})
-.eq("numero",numeroActual);
+  if (error) {
+    alert("Error: " + error.message);
+    return;
+  }
 
-if(error){
-alert(error.message);
-return;
-}
+  alert("✅ Nueva dinámica iniciada. Los 100 números están libres.");
 
-const {data}=await sb
-.from("numeros_rifa")
-.select("*")
-.eq("numero",numeroActual)
-.single();
+  cerrarModal();
 
-if(data){
-
-nombreComprador.textContent=
-data.comprador||"Sin comprador";
-
-tituloNumero.textContent=
-"Numero "+String(data.numero).padStart(2,"0");
-
-}
-
-await cargar();
-
-/* El modal permanece abierto */
-
-}
-
-btnLibre.onclick=()=>cambiarEstado("libre");
-
-btnApartado.onclick=()=>cambiarEstado("apartado");
-
-btnVendido.onclick=()=>cambiarEstado("ocupado");
-
-btnCerrar.onclick=()=>{
-
-modal.style.display="none";
-
-numeroActual=null;
-
+  await cargar();
 };
 
-window.onclick=e=>{
-
-if(e.target===modal){
-
-modal.style.display="none";
-
-numeroActual=null;
-
-}
-
-};
-
-sb.channel("panel_admin")
-.on(
-"postgres_changes",
-{
-event:"*",
-schema:"public",
-table:"numeros_rifa"
-},
-()=>{
+// Actualización en tiempo real
+sb.channel("rifa_tiempo_real")
+  .on(
+    "postgres_changes",
+    {
+      event: "*",
+      schema: "public",
+      table: "numeros_rifa"
+    },
+    () => {
+      cargar();
+    }
+  )
+  .subscribe();
 
 cargar();
 
-}
-)
-.subscribe();
-
-cargar();
-
-
-setInterval(() => { try { cargar(); } catch(e) {} }, 5000);
+// Respaldo: revisar cada 60 segundos
+setInterval(cargar, 60000);

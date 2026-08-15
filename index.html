@@ -2,362 +2,440 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rif@ MILLONARIA</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dinámica Millonaria - Rif@s Duarte</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+*{box-sizing:border-box}
 
-  body {
-    background: #0f172a;
-    color: #f1f5f9;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    padding-bottom: 110px;
-  }
+body{
+margin:0;
+background:#080808;
+font-family:Arial,sans-serif;
+color:#fff;
+}
 
-  .container { max-width: 480px; margin: 0 auto; padding: 20px 16px; }
+.contenedor{
+width:100%;
+max-width:700px;
+margin:auto;
+padding:12px;
+}
 
-  header { text-align: center; margin-bottom: 20px; }
-  header .titulo {
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    font-size: 28px; font-weight: bold; color: #ffffff;
-  }
-  header .slot { font-size: 34px; margin: 8px 0; }
-  header p { color: #94a3b8; font-size: 14px; margin-top: 6px; }
+.carton{
+background:linear-gradient(145deg,#101010,#1a1a1a);
+border:4px solid #d4af37;
+border-radius:18px;
+padding:18px 12px 20px;
+box-shadow:0 0 25px rgba(212,175,55,.35);
+}
 
-  .banner-valor {
-    background: #10b981; color: #06281c; font-weight: bold;
-    text-align: center; padding: 14px; border-radius: 10px;
-    font-size: 16px; margin-bottom: 16px;
-  }
+.titulo{
+text-align:center;
+color:#f5c542;
+font-size:32px;
+font-weight:900;
+letter-spacing:1px;
+margin-bottom:5px;
+}
 
-  .aviso {
-    background: #1e293b; border-left: 4px solid #f59e0b; border-radius: 8px;
-    padding: 12px 14px; font-size: 14px; color: #cbd5e1; margin-bottom: 22px;
-  }
+.organiza{
+text-align:center;
+font-size:22px;
+font-weight:bold;
+margin-bottom:15px;
+}
 
-  .seccion-titulo {
-    display: flex; align-items: center; gap: 8px; color: #f59e0b;
-    font-size: 18px; font-weight: bold; margin-bottom: 10px;
-    padding-bottom: 8px; border-bottom: 2px solid #f59e0b;
-  }
+.linea{
+height:3px;
+background:#d4af37;
+margin:10px 30px 16px;
+}
 
-  section { margin-bottom: 26px; }
+.info{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
+margin-bottom:14px;
+}
 
-  .premio-item {
-    background: #1e293b; border-radius: 10px; padding: 12px 14px; margin-bottom: 10px;
-    display: flex; justify-content: space-between; align-items: center; gap: 10px;
-  }
-  .premio-item .info .titulo-premio { font-size: 15px; font-weight: bold; color: #f1f5f9; }
-  .premio-item .info .detalle-premio { font-size: 12px; color: #94a3b8; margin-top: 2px; }
-  .premio-item .monto { color: #f59e0b; font-weight: bold; font-size: 17px; white-space: nowrap; }
+.info-box{
+border:2px solid #d4af37;
+border-radius:10px;
+padding:8px;
+text-align:center;
+}
 
-  .loteria-hoy {
-    background: #1e293b; border-left: 4px solid #f59e0b; border-radius: 10px;
-    padding: 14px; display: flex; justify-content: space-between; align-items: center;
-  }
-  .loteria-hoy .dia { font-size: 12px; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.5px; }
-  .loteria-hoy .nombre { font-size: 16px; font-weight: bold; color: #f1f5f9; margin-top: 2px; }
-  .loteria-hoy .hora { font-size: 18px; font-weight: bold; color: #10b981; }
+.info-box small{
+display:block;
+color:#ddd;
+font-size:12px;
+}
 
-  .pago-caja { background: #1e293b; border-radius: 10px; padding: 14px; }
-  .pago-caja p { font-size: 14px; margin-bottom: 8px; color: #f1f5f9; }
-  .pago-caja .nequi-linea { font-size: 17px; font-weight: bold; }
-  .pago-caja .nequi-linea .numero { color: #10b981; }
-  .pago-caja .titular { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+.info-box strong{
+display:block;
+color:#f5c542;
+font-size:18px;
+margin-top:3px;
+}
 
-  .leyenda { display: flex; justify-content: center; gap: 18px; margin-bottom: 12px; font-size: 12px; color: #cbd5e1; }
-  .leyenda span { display: flex; align-items: center; gap: 6px; }
-  .dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
-  .dot.libre { background: #10b981; }
-  .dot.ocupado { background: #ef4444; }
-  .dot.seleccion { background: #f59e0b; }
+.valor{
+background:#d4af37;
+color:#111;
+font-size:21px;
+font-weight:900;
+text-align:center;
+padding:10px;
+border-radius:8px;
+margin-bottom:15px;
+}
 
-  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-  @media (min-width: 380px) { .grid { grid-template-columns: repeat(6, 1fr); } }
-  @media (min-width: 460px) { .grid { grid-template-columns: repeat(8, 1fr); } }
+.aviso{
+text-align:center;
+font-size:15px;
+line-height:1.4;
+color:#eee;
+margin:10px 5px 15px;
+}
 
-  .cell {
-    aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center;
-    border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer;
-    user-select: none; color: #fff; transition: transform 0.1s ease;
-  }
-  .cell:active { transform: scale(0.92); }
-  .cell.libre { background: #10b981; }
-  .cell.ocupado { background: #ef4444; cursor: not-allowed; opacity: 0.85; }
-  .cell.seleccionado { background: #f59e0b; color: #0f172a; }
+.aviso strong{
+color:#f5c542;
+}
 
-  .resumen { margin-top: 14px; font-size: 13px; color: #94a3b8; text-align: center; }
-  .resumen strong { color: #f1f5f9; }
+.premios{
+border-top:2px solid #d4af37;
+border-bottom:2px solid #d4af37;
+padding:10px 4px;
+margin-bottom:15px;
+}
 
-  .whatsapp-fixed {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 999;
-    background: #10b981; color: #06281c; border: none; padding: 16px;
-    font-size: 15px; font-weight: bold; text-align: center; display: block;
-    width: 100%; text-decoration: none; box-shadow: 0 -4px 12px rgba(0,0,0,0.35);
-  }
-  .whatsapp-fixed:active { background: #0ea371; }
-  .whatsapp-fixed:disabled, .whatsapp-fixed.deshabilitado {
-    background: #475569; color: #94a3b8; cursor: not-allowed;
-  }
+.premios h2{
+text-align:center;
+color:#f5c542;
+font-size:22px;
+margin:3px 0 10px;
+}
+
+.premio{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:5px 2px;
+font-size:15px;
+}
+
+.premio strong{
+color:#f5c542;
+}
+
+.pago{
+background:#111;
+border:1px solid #555;
+border-radius:10px;
+padding:12px;
+margin-bottom:15px;
+text-align:center;
+}
+
+.pago h2{
+color:#f5c542;
+font-size:19px;
+margin:0 0 8px;
+}
+
+.pago div{
+font-size:16px;
+margin:5px 0;
+}
+
+.carton-titulo{
+text-align:center;
+color:#f5c542;
+font-size:22px;
+font-weight:bold;
+margin:12px 0;
+}
+
+.leyenda{
+display:flex;
+justify-content:center;
+gap:15px;
+font-size:13px;
+margin-bottom:10px;
+}
+
+.leyenda span{
+display:flex;
+align-items:center;
+gap:4px;
+}
+
+.punto{
+width:13px;
+height:13px;
+border-radius:3px;
+display:inline-block;
+}
+
+.libre-p{
+background:#fff;
+border:1px solid #aaa;
+}
+
+.apartado-p{
+background:#20c55a;
+}
+
+.pagado-p{
+background:#e62b35;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(10,1fr);
+gap:3px;
+background:#050505;
+border:2px solid #d4af37;
+padding:5px;
+}
+
+.numero{
+aspect-ratio:1/1;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:900;
+font-size:clamp(10px,3.5vw,22px);
+border-radius:3px;
+color:#111;
+background:#fff;
+position:relative;
+overflow:hidden;
+}
+
+.numero.apartado{
+background:#20c55a;
+color:#fff;
+}
+
+.numero.pagado{
+background:#e62b35;
+color:#fff;
+}
+
+.numero.apartado::after,
+.numero.pagado::after{
+content:"";
+position:absolute;
+inset:2px;
+border:1px solid rgba(255,255,255,.35);
+border-radius:3px;
+}
+
+.numero.pagado{
+text-shadow:0 1px 2px #000;
+}
+
+.pie{
+text-align:center;
+margin-top:12px;
+font-size:12px;
+color:#aaa;
+}
+
+.actualizando{
+text-align:center;
+font-size:11px;
+color:#777;
+margin-top:6px;
+}
+
+@media(max-width:400px){
+.contenedor{padding:5px}
+.carton{padding:12px 6px}
+.titulo{font-size:25px}
+.organiza{font-size:18px}
+.valor{font-size:18px}
+.grid{gap:2px;padding:4px}
+}
 </style>
 </head>
+
 <body>
 
-<div class="container">
+<div class="contenedor">
 
-  <header>
-    <div class="titulo">🎰 Rif@ MILLONARIA</div>
-    <div class="slot">🎰</div>
-    <p>¡Participa, aparta tu número y gana grandes premios!</p>
-  </header>
+<div class="carton">
 
-  <div class="banner-valor">💵 Valor del Puesto: $3.000</div>
+<div class="titulo">🎰 DINÁMICA MILLONARIA</div>
+<div class="organiza">Rif@s Duarte</div>
 
-  <div class="aviso">📊 La rifa se juega al completar mínimo el 80% de los números vendidos.</div>
+<div class="linea"></div>
 
-  <section>
-    <div class="seccion-titulo">🏆 Premios en Juego</div>
-    <div class="premio-item">
-      <div class="info">
-        <div class="titulo-premio">🥇 1er Premio</div>
-        <div class="detalle-premio">Con los 2 últimos números</div>
-      </div>
-      <div class="monto">$130.000</div>
-    </div>
-    <div class="premio-item">
-      <div class="info">
-        <div class="titulo-premio">🥈 2do Premio</div>
-        <div class="detalle-premio">Con los 2 primeros números</div>
-      </div>
-      <div class="monto">$35.000</div>
-    </div>
-    <div class="premio-item">
-      <div class="info">
-        <div class="titulo-premio">🥉 3er Premio</div>
-        <div class="detalle-premio">Con los 2 números del medio</div>
-      </div>
-      <div class="monto">$25.000</div>
-    </div>
-  </section>
+<div class="info">
 
-  <section>
-    <div class="seccion-titulo">🎲 Lotería de Hoy</div>
-    <div class="loteria-hoy" id="loteriaHoy">
-      <div>
-        <div class="dia" id="loteriaDia">-</div>
-        <div class="nombre" id="loteriaNombre">-</div>
-      </div>
-      <div class="hora" id="loteriaHora">-</div>
-    </div>
-  </section>
+<div class="info-box">
+<small>PREMIO MAYOR</small>
+<strong>$130.000</strong>
+</div>
 
-  <section>
-    <div class="seccion-titulo">💳 Forma de Pago</div>
-    <div class="pago-caja">
-      <p>1. Transfiere al Nequi:</p>
-      <div class="nequi-linea">💚 Nequi: <span class="numero">3214019528</span></div>
-      <div class="titular">Titular: Rif@s Duarte</div>
-    </div>
-  </section>
-
-  <section>
-    <div class="seccion-titulo">🔢 Números Disponibles</div>
-    <div class="leyenda">
-      <span><i class="dot libre"></i> Libre</span>
-      <span><i class="dot ocupado"></i> Ocupado</span>
-      <span><i class="dot seleccion"></i> Apartado</span>
-    </div>
-    <div class="grid" id="grid"></div>
-    <div class="resumen">
-      Seleccionados: <strong id="resumenSeleccion">Ninguno</strong>
-    </div>
-  </section>
+<div class="info-box">
+<small>VALOR DEL NÚMERO</small>
+<strong>$3.000</strong>
+</div>
 
 </div>
 
-<a href="#" class="whatsapp-fixed" id="btnWhatsapp">Enviar Comprobante por WhatsApp</a>
+<div class="valor">
+🎟️ CARTÓN OFICIAL 00 AL 99
+</div>
+
+<div class="aviso">
+La dinámica se realizará <strong>únicamente cuando el cartón esté completamente lleno</strong>.
+<br>
+La fecha y hora serán informadas en el grupo.
+</div>
+
+<div class="premios">
+
+<h2>🏆 PREMIOS</h2>
+
+<div class="premio">
+<span>🥇 2 últimos números</span>
+<strong>$130.000</strong>
+</div>
+
+<div class="premio">
+<span>🥈 2 primeros números</span>
+<strong>$35.000</strong>
+</div>
+
+<div class="premio">
+<span>🥉 2 números del medio</span>
+<strong>$35.000</strong>
+</div>
+
+</div>
+
+<div class="pago">
+
+<h2>💳 FORMAS DE PAGO</h2>
+
+<div>💚 <strong>Nequi:</strong> 3214019528</div>
+<div>💳 <strong>Daviplata:</strong> 3150835390</div>
+
+</div>
+
+<div class="carton-titulo">
+🔢 NÚMEROS 00–99
+</div>
+
+<div class="leyenda">
+<span><i class="punto libre-p"></i> Libre</span>
+<span><i class="punto apartado-p"></i> Apartado</span>
+<span><i class="punto pagado-p"></i> Pagado</span>
+</div>
+
+<div id="grid" class="grid"></div>
+
+<div class="pie">
+📲 Consulte el número disponible directamente en el grupo.
+</div>
+
+<div id="actualizando" class="actualizando">
+Actualizando cartón...
+</div>
+
+</div>
+</div>
 
 <script>
-  const WHATSAPP_NUMERO = "573214019528";
 
-  // ---------- Loteria del dia ----------
-  const loterias = [
-    { nombre: "Motilón Noche",           hora: "9:00 PM"  },
-    { nombre: "Lotería del Tolima",      hora: "10:30 PM" },
-    { nombre: "Lotería de la Cruz Roja", hora: "10:30 PM" },
-    { nombre: "Lotería de Manizales",    hora: "10:30 PM" },
-    { nombre: "Lotería de Bogotá",       hora: "11:10 PM" },
-    { nombre: "Lotería de Santander",    hora: "11:00 PM" },
-    { nombre: "Lotería de Boyacá",       hora: "10:40 PM" }
-  ];
-  const nombresDias = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+const SUPABASE_URL="https://egzyiruqivlvqjfhgrba.supabase.co";
+const SUPABASE_KEY="sb_publishable_t34FtTx_shKUXA_vAIPV8w_L5FLhw9V";
 
-  function pintarLoteriaDelDia() {
-  document.getElementById("loteriaDia").textContent = "MIÉRCOLES 12 DE AGOSTO DE 2026";
-  document.getElementById("loteriaNombre").textContent = "Lotería de Manizales";
-  document.getElementById("loteriaHora").textContent = "10:30 PM";
+const sb=window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+const grid=document.getElementById("grid");
+const actualizando=document.getElementById("actualizando");
+
+function dibujar(data){
+
+const estados={};
+
+data.forEach(r=>{
+estados[Number(r.numero)]=r.estado;
+});
+
+grid.innerHTML="";
+
+for(let n=0;n<=99;n++){
+
+const d=document.createElement("div");
+
+let estado=estados[n] || "libre";
+
+if(estado==="ocupado"){
+estado="pagado";
 }
-pintarLoteriaDelDia();
 
-  // ---------- Grilla ----------
-  const gridEl = document.getElementById("grid");
-  const seleccionados = new Set();
-  let numerosData = {};
+d.className="numero "+estado;
+d.textContent=String(n).padStart(2,"0");
 
-  function renderGrid() {
-    gridEl.innerHTML = "";
-    for (let n = 0; n <= 99; n++) {
-      const info = numerosData[n];
-      const estado = info ? info.estado : "libre";
-      const div = document.createElement("div");
-      div.className = "cell " + (estado === "ocupado" ? "ocupado" : (estado === "apartado" ? "seleccionado" : "libre"));
-      if (seleccionados.has(n)) div.classList.add("seleccionado");
-      div.textContent = n.toString().padStart(2, "0");
-      if (estado !== "ocupado") {
-        div.addEventListener("click", () => toggleSeleccion(n, div));
-      }
-      gridEl.appendChild(div);
-    }
-  }
+grid.appendChild(d);
+}
 
-  function toggleSeleccion(n, el) {
-    if (seleccionados.has(n)) {
-      seleccionados.delete(n);
-      el.classList.remove("seleccionado");
-    } else {
-      seleccionados.add(n);
-      el.classList.add("seleccionado");
-    }
-    actualizarResumen();
-  }
+actualizando.textContent=
+"Actualizado: "+
+new Date().toLocaleTimeString("es-CO");
 
-  function actualizarResumen() {
-    const texto = seleccionados.size === 0
-      ? "Ninguno"
-      : Array.from(seleccionados).sort((a,b)=>a-b).map(n => n.toString().padStart(2,"0")).join(", ");
-    document.getElementById("resumenSeleccion").textContent = texto;
-  }
+}
 
-  renderGrid();
+async function cargar(){
 
-  // ---------- Supabase ----------
-  const SUPABASE_URL = "https://egzyiruqivlvqjfhgrba.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_t34FtTx_shKUXA_vAIPV8w_L5FLhw9V";
-  let sb = null;
+const {data,error}=await sb
+.from("numeros_rifa")
+.select("numero,estado")
+.order("numero");
 
-  try {
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+if(error){
 
-    async function cargarNumeros() {
-      try {
-        const { data, error } = await sb
-          .from("numeros_rifa")
-          .select("id, numero, estado, comprador");
-        if (error) { console.error("Error cargando numeros_rifa:", error); return; }
-        numerosData = {};
-        data.forEach(row => { numerosData[row.numero] = row; });
-        renderGrid();
-      } catch (e) {
-        console.error("Fallo cargarNumeros:", e);
-      }
-    }
-    cargarNumeros();
+console.error(error);
 
-    sb
-      .channel("numeros_rifa_cambios")
-      .on("postgres_changes", { event: "*", schema: "public", table: "numeros_rifa" }, (payload) => {
-        const row = payload.new;
-        if (row) {
-          cargarNumeros();
-        }
-      })
-      .subscribe();
-  } catch (e) {
-    console.error("No se pudo inicializar Supabase:", e);
-  }
+actualizando.textContent=
+"Error actualizando cartón";
 
-  // ---------- Boton whatsapp: marca automaticamente como ocupado ----------
-  const btnWhatsapp = document.getElementById("btnWhatsapp");
+return;
+}
 
-  btnWhatsapp.addEventListener("click", async (e) => {
-    e.preventDefault();
+dibujar(data||[]);
+}
 
-    if (seleccionados.size === 0) {
-      alert("Selecciona al menos un número antes de enviar el comprobante.");
-      return;
-    }
+cargar();
 
-    if (!sb) {
-      alert("No se pudo conectar con la base de datos. Intenta de nuevo en unos segundos.");
-      return;
-    }
+sb
+.channel("carton-publico")
+.on(
+"postgres_changes",
+{
+event:"*",
+schema:"public",
+table:"numeros_rifa"
+},
+()=>{
+cargar();
+}
+)
+.subscribe();
 
-    const nombreComprador = prompt("Escribe tu nombre completo para apartar el número:");
-    if (!nombreComprador || nombreComprador.trim() === "") {
-      alert("Debes escribir tu nombre para continuar.");
-      return;
-    }
+setInterval(cargar,60000);
 
-    const numerosSeleccionados = Array.from(seleccionados).sort((a,b)=>a-b);
-
-    btnWhatsapp.textContent = "Apartando número(s)...";
-    btnWhatsapp.classList.add("deshabilitado");
-
-    try {
-      // Solo marca los que SIGAN libres en este momento (evita choques si dos personas eligen a la vez)
-      const { data, error } = await sb
-        .from("numeros_rifa")
-        .update({ estado: "ocupado", comprador: nombreComprador.trim() })
-        .in("numero", numerosSeleccionados)
-        .eq("estado", "libre")
-        .select();
-
-      if (error) {
-        console.error("Error marcando numeros:", error);
-        alert("Hubo un error al apartar el número. Intenta de nuevo.");
-        btnWhatsapp.textContent = "Enviar Comprobante por WhatsApp";
-        btnWhatsapp.classList.remove("deshabilitado");
-        return;
-      }
-
-      const numerosMarcados = data.map(r => r.numero);
-      const numerosNoDisponibles = numerosSeleccionados.filter(n => !numerosMarcados.includes(n));
-
-      if (numerosNoDisponibles.length > 0) {
-        alert("Uno o más números que elegiste ya fueron tomados por otra persona: " +
-          numerosNoDisponibles.map(n => n.toString().padStart(2,"0")).join(", ") +
-          ". Por favor elige otro número.");
-      }
-
-      if (numerosMarcados.length === 0) {
-        btnWhatsapp.textContent = "Enviar Comprobante por WhatsApp";
-        btnWhatsapp.classList.remove("deshabilitado");
-        seleccionados.clear();
-        actualizarResumen();
-        return;
-      }
-
-      const textoNumeros = numerosMarcados.sort((a,b)=>a-b).map(n => n.toString().padStart(2,"0")).join(", ");
-      const mensaje = `Hola, soy ${nombreComprador.trim()}. Quiero enviar el comprobante de pago por el/los número(s) ${textoNumeros} de la Rif@ MILLONARIA.`;
-      const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensaje)}`;
-      window.location.href = url;
-
-      seleccionados.clear();
-      actualizarResumen();
-      btnWhatsapp.textContent = "Enviar Comprobante por WhatsApp";
-      btnWhatsapp.classList.remove("deshabilitado");
-    } catch (e) {
-      console.error("Fallo al apartar numeros:", e);
-      alert("Hubo un error de conexión. Intenta de nuevo.");
-      btnWhatsapp.textContent = "Enviar Comprobante por WhatsApp";
-      btnWhatsapp.classList.remove("deshabilitado");
-    }
-  });
 </script>
 
 </body>
 </html>
-
-
-setInterval(() => { try { cargarNumeros(); } catch(e) {} }, 5000);

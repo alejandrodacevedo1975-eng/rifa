@@ -3,50 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Panel Administrador</title>
-
+<title>Panel - Rif@s Duarte</title>
 <link rel="stylesheet" href="admin.css">
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-
 <body>
 
-<h1>🎛 Panel Administrador</h1>
+<header>
+<h1>🎛️ Panel Rif@s Duarte</h1>
+<p>Administración de la dinámica 00–99</p>
+</header>
 
 <div class="estadisticas">
-<div>🟢<br><span id="libres">0</span></div>
-<div>🟡<br><span id="apartados">0</span></div>
-<div>🔴<br><span id="vendidos">0</span></div>
+<div class="libres">⚪<strong id="libres">0</strong><span>Libres</span></div>
+<div class="apartados">🟢<strong id="apartados">0</strong><span>Apartados</span></div>
+<div class="pagados">🔴<strong id="pagados">0</strong><span>Pagados</span></div>
 </div>
+
+<div class="progreso">
+<div class="progreso-titulo">
+<span>PROGRESO DEL CARTÓN</span>
+<strong id="contador">0 / 100</strong>
+</div>
+<div class="barra">
+<div id="barraProgreso"></div>
+</div>
+<p id="mensajeProgreso">La dinámica aún no está completa.</p>
+</div>
+
+<div class="acciones">
+<button id="btnNuevaDinamica">🔄 NUEVA DINÁMICA</button>
+</div>
+
+<h2>🔢 CARTÓN 00–99</h2>
 
 <div id="grid"></div>
 
 <div id="modal" class="modal">
-
 <div class="ventana">
 
-<h2 id="tituloNumero"></h2>
+<button class="cerrar-x" id="btnCerrarX">×</button>
 
-<p id="nombreComprador"></p>
+<h2 id="tituloNumero">Número 00</h2>
+
+<div class="estado-actual">
+Estado actual:
+<strong id="estadoActual">Libre</strong>
+</div>
+
+<div class="comprador">
+<strong>Comprador:</strong>
+<span id="nombreComprador">Sin registrar</span>
+</div>
 
 <div class="botones">
-
-<button id="btnLibre">🟢 Libre</button>
-
-<button id="btnApartado">🟡 Apartado</button>
-
-<button id="btnVendido">🔴 Vendido</button>
-
+<button id="btnLibre">⚪ LIBRE</button>
+<button id="btnApartado">🟢 APARTADO</button>
+<button id="btnPagado">🔴 PAGADO</button>
 </div>
 
-<button id="btnCerrar">Cerrar</button>
+<button id="btnCerrar">CERRAR</button>
 
 </div>
-
 </div>
 
-<script src="admin.js?v=999"></script>
+<script src="admin.js?v=20260815"></script>
 
 </body>
 </html>
