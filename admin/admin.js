@@ -400,83 +400,163 @@ btnGenerarCarton.onclick = async () => {
     }
 
     /* =========================
-       PUBLICIDAD
+       PUBLICIDAD PARA WHATSAPP
        ========================= */
 
-    let y = 820;
+    let y = 850;
 
+    /* Separación del cartón */
+    ctx.strokeStyle = "#d4af37";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(80, y - 25);
+    ctx.lineTo(1000, y - 25);
+    ctx.stroke();
+
+    /* Título */
     ctx.fillStyle = "#f5c542";
-    ctx.font = "900 38px Arial";
-    ctx.fillText("DINÁMICA MILLONARIA", 540, y);
+    ctx.font = "900 40px Arial";
+    ctx.fillText("🎉 ¡DINÁMICA ABIERTA! 🎉", 540, y + 25);
 
-    y += 48;
+    y += 65;
 
+    /* Nombre */
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 28px Arial";
-    ctx.fillText("Rif@s Duarte", 540, y);
-
-    y += 48;
-
-    ctx.fillStyle = "#f5c542";
     ctx.font = "900 30px Arial";
-    ctx.fillText("VALOR POR NÚMERO: $3.000", 540, y);
+    ctx.fillText("🍀 RIF@S DUARTE 🍀", 540, y);
+
+    y += 50;
+
+    /* Valor */
+    ctx.fillStyle = "#f5c542";
+    ctx.font = "900 29px Arial";
+    ctx.fillText("🎟️ VALOR POR NÚMERO: $3.000", 540, y);
 
     y += 55;
 
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 27px Arial";
-    ctx.fillText("PREMIOS", 540, y);
-
-    y += 38;
-
-    ctx.font = "bold 24px Arial";
-    ctx.fillText("1er PREMIO • 2 ÚLTIMOS NÚMEROS: $130.000", 540, y);
-
-    y += 35;
-
-    ctx.fillText("2do PREMIO • 2 PRIMEROS NÚMEROS: $35.000", 540, y);
-
-    y += 35;
-
-    ctx.fillText("3er PREMIO • 2 NÚMEROS DEL MEDIO: $35.000", 540, y);
-
-    y += 48;
-
-    ctx.fillStyle = "#20c55a";
-    ctx.font = "bold 25px Arial";
-    ctx.fillText(`APARTADOS: ${apartados}`, 540, y);
-
-    y += 35;
-
-    ctx.fillStyle = "#ed3038";
-    ctx.fillText(`PAGADOS: ${pagados}/100`, 540, y);
-
-    y += 55;
+    /* Caja de premios */
+    ctx.fillStyle = "#171d1f";
+    ctx.fillRect(70, y - 30, 940, 175);
 
     ctx.strokeStyle = "#d4af37";
     ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(100, y);
-    ctx.lineTo(980, y);
-    ctx.stroke();
-
-    y += 45;
+    ctx.strokeRect(70, y - 30, 940, 175);
 
     ctx.fillStyle = "#f5c542";
-    ctx.font = "900 29px Arial";
-    ctx.fillText("FORMAS DE PAGO", 540, y);
+    ctx.font = "900 28px Arial";
+    ctx.fillText("🏆 PREMIOS 🏆", 540, y + 5);
 
-    y += 40;
+    y += 42;
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 25px Arial";
-    ctx.fillText("Nequi: 3214019528", 540, y);
+    ctx.font = "bold 22px Arial";
 
-    y += 36;
+    ctx.fillText(
+      "🥇 $130.000  →  2 ÚLTIMAS CIFRAS",
+      540, y
+    );
 
-    ctx.fillText("Daviplata: 3150835390", 540, y);
+    y += 34;
 
-    /* =========================
+    ctx.fillText(
+      "🥈 $35.000  →  2 PRIMERAS CIFRAS",
+      540, y
+    );
+
+    y += 34;
+
+    ctx.fillText(
+      "🥉 $35.000  →  2 NÚMEROS DEL MEDIO",
+      540, y
+    );
+
+    y += 65;
+
+    /* Información */
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 24px Arial";
+    ctx.fillText(
+      "📲 ELIGE TU NÚMERO DISPONIBLE",
+      540, y
+    );
+
+    y += 34;
+
+    ctx.font = "20px Arial";
+    ctx.fillStyle = "#cccccc";
+    ctx.fillText(
+      "Escribe en el grupo cuál número deseas.",
+      540, y
+    );
+
+    y += 48;
+
+    /* Estado */
+    ctx.fillStyle = "#20c55a";
+    ctx.font = "bold 22px Arial";
+    ctx.fillText(
+      `🟢 APARTADOS: ${apartados}`,
+      540, y
+    );
+
+    y += 32;
+
+    ctx.fillStyle = "#ed3038";
+    ctx.fillText(
+      `🔴 PAGADOS: ${pagados}/100`,
+      540, y
+    );
+
+    y += 52;
+
+    /* Pagos */
+    ctx.fillStyle = "#171d1f";
+    ctx.fillRect(70, y - 28, 940, 125);
+
+    ctx.strokeStyle = "#d4af37";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(70, y - 28, 940, 125);
+
+    ctx.fillStyle = "#f5c542";
+    ctx.font = "900 27px Arial";
+    ctx.fillText("💳 FORMAS DE PAGO 💳", 540, y + 5);
+
+    y += 38;
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 22px Arial";
+    ctx.fillText(
+      "💚 Nequi: 3214019528",
+      540, y
+    );
+
+    y += 32;
+
+    ctx.fillText(
+      "💳 Daviplata: 3150835390",
+      540, y
+    );
+
+    y += 55;
+
+    /* Mensaje final */
+    ctx.fillStyle = "#f5c542";
+    ctx.font = "900 25px Arial";
+    ctx.fillText(
+      "⏳ SE JUEGA AL COMPLETAR EL CARTÓN",
+      540, y
+    );
+
+    y += 38;
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 24px Arial";
+    ctx.fillText(
+      "🍀 ¡MUCHA SUERTE PARA TODOS! 🍀",
+      540, y
+    );
+
+/* =========================
        LOTERÍA SOLO AL COMPLETAR
        ========================= */
 
