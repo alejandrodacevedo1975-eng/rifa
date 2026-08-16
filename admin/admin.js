@@ -257,7 +257,7 @@ cargar();
 
 
 /* =========================================================
-   GENERAR CARTÓN COMPLETO PARA WHATSAPP
+   GENERADOR DE CARTÓN PARA WHATSAPP
    ========================================================= */
 
 const btnGenerarCarton = document.getElementById("btnGenerarCarton");
@@ -295,113 +295,70 @@ btnGenerarCarton.onclick = async () => {
       r.estado === "apartado"
     ).length;
 
+    /* LOTERÍA SOLO CUANDO ESTÉ COMPLETO */
+    let loteria = "";
+
+    if (pagados === 100) {
+      loteria = prompt(
+        "🎉 CARTÓN COMPLETO\n\nEscriba la lotería y la hora:\nEjemplo: ASTRO SOL - 9:00 PM"
+      );
+
+      if (!loteria) {
+        alert("Debe indicar la lotería para generar el cartón final.");
+        return;
+      }
+    }
+
     /* =========================
-       CANVAS
+       IMAGEN
        ========================= */
 
     const canvas = document.createElement("canvas");
 
     canvas.width = 1080;
-    canvas.height = 1380;
+    canvas.height = pagados === 100 ? 1580 : 1480;
 
     const ctx = canvas.getContext("2d");
 
-    /* Fondo */
-    ctx.fillStyle = "#080808";
-    ctx.fillRect(0, 0, 1080, 1380);
+    /* FONDO */
+    ctx.fillStyle = "#20282b";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    /* Borde */
+    /* BORDE */
     ctx.strokeStyle = "#d4af37";
-    ctx.lineWidth = 10;
-    ctx.strokeRect(12, 12, 1056, 1356);
+    ctx.lineWidth = 12;
+    ctx.strokeRect(18, 18, 1044, canvas.height - 36);
 
     ctx.textAlign = "center";
 
     /* =========================
-       ENCABEZADO
+       CABECERA
        ========================= */
 
     ctx.fillStyle = "#f5c542";
-    ctx.font = "900 52px Arial";
-    ctx.fillText("DINÁMICA MILLONARIA", 540, 65);
+    ctx.font = "900 58px Arial";
+    ctx.fillText("DINÁMICA MILLONARIA", 540, 85);
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 34px Arial";
-    ctx.fillText("Rif@s Duarte", 540, 105);
+    ctx.font = "bold 38px Arial";
+    ctx.fillText("Rif@s Duarte", 540, 135);
 
     ctx.strokeStyle = "#d4af37";
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(90, 130);
-    ctx.lineTo(990, 130);
+    ctx.moveTo(100, 165);
+    ctx.lineTo(980, 165);
     ctx.stroke();
 
-    /* Valor */
-    ctx.fillStyle = "#d4af37";
-    ctx.fillRect(120, 150, 840, 58);
-
-    ctx.fillStyle = "#111111";
-    ctx.font = "900 30px Arial";
-    ctx.fillText("VALOR DEL NÚMERO: $3.000", 540, 188);
-
-    /* Aviso */
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 23px Arial";
-    ctx.fillText(
-      "SE JUEGA ÚNICAMENTE AL COMPLETAR EL CARTÓN",
-      540, 245
-    );
-
-    ctx.fillStyle = "#aaaaaa";
-    ctx.font = "20px Arial";
-    ctx.fillText(
-      "Los 100 números deben estar vendidos y pagados.",
-      540, 275
-    );
-
     /* =========================
-       PREMIOS
+       CARTÓN
        ========================= */
 
-    ctx.fillStyle = "#f5c542";
-    ctx.font = "900 27px Arial";
-    ctx.fillText("🏆 PREMIOS", 540, 320);
-
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 21px Arial";
-
-    ctx.fillText(
-      "🥇 2 ÚLTIMOS NÚMEROS: $130.000",
-      540, 355
-    );
-
-    ctx.fillText(
-      "🥈 2 PRIMEROS NÚMEROS: $35.000",
-      540, 387
-    );
-
-    ctx.fillText(
-      "🥉 2 NÚMEROS DEL MEDIO: $35.000",
-      540, 419
-    );
-
-    /* Estado */
-    ctx.fillStyle = "#f5c542";
-    ctx.font = "bold 23px Arial";
-    ctx.fillText(
-      `PAGADOS: ${pagados}/100   |   APARTADOS: ${apartados}`,
-      540, 455
-    );
-
-    /* =========================
-       CARTÓN 00-99
-       ========================= */
-
-    const startX = 30;
-    const startY = 480;
+    const startX = 35;
+    const startY = 195;
 
     const cellW = 100;
-    const cellH = 55;
+    const cellH = 58;
     const gap = 3;
 
     for (let n = 0; n <= 99; n++) {
@@ -419,7 +376,7 @@ btnGenerarCarton.onclick = async () => {
       if (estado === "apartado") {
         ctx.fillStyle = "#20c55a";
       } else if (estado === "pagado") {
-        ctx.fillStyle = "#e62b35";
+        ctx.fillStyle = "#ed3038";
       } else {
         ctx.fillStyle = "#ffffff";
       }
@@ -433,68 +390,129 @@ btnGenerarCarton.onclick = async () => {
       ctx.fillStyle =
         estado === "libre" ? "#111111" : "#ffffff";
 
-      ctx.font = "900 25px Arial";
+      ctx.font = "900 27px Arial";
 
       ctx.fillText(
         String(n).padStart(2, "0"),
         x + cellW / 2,
-        y + 36
+        y + 39
       );
     }
 
     /* =========================
-       PUBLICIDAD INFERIOR
+       PUBLICIDAD
        ========================= */
 
-    const abajo = 1045;
+    let y = 820;
+
+    ctx.fillStyle = "#f5c542";
+    ctx.font = "900 38px Arial";
+    ctx.fillText("DINÁMICA MILLONARIA", 540, y);
+
+    y += 48;
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 28px Arial";
+    ctx.fillText("Rif@s Duarte", 540, y);
+
+    y += 48;
+
+    ctx.fillStyle = "#f5c542";
+    ctx.font = "900 30px Arial";
+    ctx.fillText("VALOR POR NÚMERO: $3.000", 540, y);
+
+    y += 55;
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 27px Arial";
+    ctx.fillText("PREMIOS", 540, y);
+
+    y += 38;
+
+    ctx.font = "bold 24px Arial";
+    ctx.fillText("1er PREMIO • 2 ÚLTIMOS NÚMEROS: $130.000", 540, y);
+
+    y += 35;
+
+    ctx.fillText("2do PREMIO • 2 PRIMEROS NÚMEROS: $35.000", 540, y);
+
+    y += 35;
+
+    ctx.fillText("3er PREMIO • 2 NÚMEROS DEL MEDIO: $35.000", 540, y);
+
+    y += 48;
+
+    ctx.fillStyle = "#20c55a";
+    ctx.font = "bold 25px Arial";
+    ctx.fillText(`APARTADOS: ${apartados}`, 540, y);
+
+    y += 35;
+
+    ctx.fillStyle = "#ed3038";
+    ctx.fillText(`PAGADOS: ${pagados}/100`, 540, y);
+
+    y += 55;
 
     ctx.strokeStyle = "#d4af37";
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(60, abajo);
-    ctx.lineTo(1020, abajo);
+    ctx.moveTo(100, y);
+    ctx.lineTo(980, y);
     ctx.stroke();
 
-    ctx.fillStyle = "#f5c542";
-    ctx.font = "900 28px Arial";
-    ctx.fillText("💰 DINÁMICA MILLONARIA", 540, abajo + 42);
-
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 22px Arial";
-    ctx.fillText(
-      "💳 FORMAS DE PAGO",
-      540, abajo + 78
-    );
-
-    ctx.fillStyle = "#20c55a";
-    ctx.font = "bold 22px Arial";
-    ctx.fillText(
-      "💚 Nequi: 3214019528",
-      540, abajo + 112
-    );
-
-    ctx.fillStyle = "#ffffff";
-    ctx.fillText(
-      "💳 Daviplata: 3150835390",
-      540, abajo + 146
-    );
+    y += 45;
 
     ctx.fillStyle = "#f5c542";
-    ctx.font = "bold 21px Arial";
-    ctx.fillText(
-      "📲 Consulte y elija su número directamente en el grupo.",
-      540, abajo + 188
-    );
+    ctx.font = "900 29px Arial";
+    ctx.fillText("FORMAS DE PAGO", 540, y);
+
+    y += 40;
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 25px Arial";
+    ctx.fillText("Nequi: 3214019528", 540, y);
+
+    y += 36;
+
+    ctx.fillText("Daviplata: 3150835390", 540, y);
+
+    /* =========================
+       LOTERÍA SOLO AL COMPLETAR
+       ========================= */
+
+    if (pagados === 100) {
+
+      y += 58;
+
+      ctx.fillStyle = "#f5c542";
+      ctx.font = "900 34px Arial";
+      ctx.fillText("CARTÓN COMPLETO", 540, y);
+
+      y += 45;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 28px Arial";
+      ctx.fillText("LOTERÍA: " + loteria, 540, y);
+
+      y += 42;
+
+      ctx.fillStyle = "#20c55a";
+      ctx.font = "900 27px Arial";
+      ctx.fillText("🎉 ¡MUCHA SUERTE! 🎉", 540, y);
+    }
+
+    y += 50;
 
     ctx.fillStyle = "#aaaaaa";
-    ctx.font = "18px Arial";
+    ctx.font = "20px Arial";
     ctx.fillText(
-      "Rif@s Duarte • Mucha suerte 🍀",
-      540, abajo + 218
+      "Consulte y elija su número directamente en el grupo.",
+      540,
+      y
     );
 
     /* =========================
-       DESCARGAR IMAGEN
+       DESCARGAR
        ========================= */
 
     canvas.toBlob(blob => {
@@ -507,15 +525,11 @@ btnGenerarCarton.onclick = async () => {
       const url = URL.createObjectURL(blob);
 
       const enlace = document.createElement("a");
+
       enlace.href = url;
 
-      const fecha = new Date()
-        .toISOString()
-        .slice(0,19)
-        .replace(/:/g,"-");
-
       enlace.download =
-        `carton-rifas-duarte-${fecha}.png`;
+        `carton-rifas-duarte-${Date.now()}.png`;
 
       document.body.appendChild(enlace);
       enlace.click();
@@ -526,9 +540,8 @@ btnGenerarCarton.onclick = async () => {
       }, 2000);
 
       alert(
-        "✅ CARTÓN COMPLETO GENERADO\n\n" +
-        "La imagen incluye publicidad, premios y los 100 números.\n\n" +
-        "Ya puede compartirla directamente en WhatsApp."
+        "✅ IMAGEN GENERADA\n\n" +
+        "El cartón completo con publicidad quedó listo para WhatsApp."
       );
 
     }, "image/png");
